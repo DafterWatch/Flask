@@ -5,6 +5,7 @@ from flask_restful import Api, Resource, reqparse
 from models import PersonaModel, db
 from flask import Flask
 from flask_cors import CORS
+from modelo import predecir
 
 app = Flask(__name__)
 CORS(app)
@@ -15,9 +16,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 api = Api(app)
 db.init_app(app)
 
+
 @app.before_first_request
 def create_table():
     db.create_all()
+
 
 class PersonaView(Resource):
     # parser = reqparse.RequestParser()
@@ -38,30 +41,35 @@ class PersonaView(Resource):
     # )/
     def get(self):
         personas = PersonaModel.query.all()
-        return {'Personas':list(x.json() for x in personas)}
+        return {'Persona': list(x.json() for x in personas)}
+
     def post(self):
         data = request.get_json()
-        new_persona = PersonaModel(data['nombres'],data['paterno'], data['materno'], data['ci'], data['celular'])
+        new_persona = PersonaModel(
+            data['nombres'], data['paterno'], data['materno'], data['ci'], data['celular'])
         db.session.add(new_persona)
         db.session.commit()
         db.session.flush()
-        #print(db.id)
-        return new_persona.json(),201
+        return new_persona.json(), 201
+
 
 class SinglePersonaView(Resource):
     def get(self, id):
+        print("ola2")
         persona = PersonaModel.query.filter_by(id_persona=id).first()
         if persona:
             return persona.json()
-        return {'message':'Persona id_persona not found'},404
+        return {'message': 'Persona id_persona not found'}, 404
+
     def delete(self, id):
         persona = PersonaModel.query.filter_by(id_persona=id).first()
         if persona:
             db.session.delete(persona)
             db.session.commit()
-            return {'message':'Deleted'}
+            return {'message': 'Deleted'}
         else:
-            return {'message':'Persona not found'},404
+            return {'message': 'Persona not found'}, 404
+
     def put(self, id):
         data = request.get_json()
         persona = PersonaModel.query.filter_by(id_persona=id).first()
@@ -72,15 +80,26 @@ class SinglePersonaView(Resource):
             persona.ci = data['ci']
             persona.celular = data['celular']
         else:
-            persona = PersonaModel(id_persona=id,**data)
+            persona = PersonaModel(id_persona=id, **data)
 
         db.session.add(persona)
         db.session.commit()
         return persona.json()
-    
+
+
+class ModeloView(Resource):
+    def post(self):
+        data = request.get_json()
+        datos = ([data['grasa'], data['altura'], data['peso'], data['experiencia'],
+                  data['sexo'], data['endomorfo'], data['mesomorfo'], data['objetivo']])
+        prediccion = predecir(datos)
+        return {"valor": str(prediccion[0])}, 201
+
+
 api.add_resource(PersonaView, '/personas')
 api.add_resource(SinglePersonaView, '/persona/<int:id>')
+api.add_resource(ModeloView, '/modelo')
 
 app.debug = True
 if __name__ == '__main__':
-    app.run(host='localhost', port=5000)
+    app.run(host='localhost', port=5000, debug=True)
