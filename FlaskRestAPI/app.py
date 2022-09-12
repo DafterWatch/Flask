@@ -2,7 +2,7 @@ from ast import parse
 from distutils import core
 from flask import Flask, request
 from flask_restful import Api, Resource, reqparse
-from models import PersonaModel, UsuarioModel, db
+from models import PersonaModel, UsuarioModel, DiagnosticoModel, db
 from flask import Flask
 from flask_cors import CORS
 from modelo import predecir
@@ -143,11 +143,62 @@ class SingleUsuarioView(Resource):
         return usuario.json()
 
 
+class DiagnosticoView(Resource):
+    def get(self):
+        diagnosticos = DiagnosticoModel.query.all()
+        return {'Diagnosticos': list(x.json() for x in diagnosticos)}
+
+    def post(self):
+        data = request.get_json()
+        new_diagnostico = DiagnosticoModel(
+            data['edad'], data['peso'], data['altura'], data['problemas_salud'], data['objetivo'], data['fk_id_persona'])
+        db.session.add(new_diagnostico)
+        db.session.commit()
+        db.session.flush()
+        return new_diagnostico.json(), 201
+
+
+class SingleDiagnosticoView(Resource):
+    def get(self, id):
+        diagnostico = DiagnosticoModel.query.filter_by(id_diagnostico=id).first()
+        if diagnostico:
+            return diagnostico.json()
+        return {'message': 'Diagnostico id_diagnostico not found'}, 404
+
+    def delete(self, id):
+        diagnostico = DiagnosticoModel.query.filter_by(id_diagnostico=id).first()
+        if diagnostico:
+            db.session.delete(diagnostico)
+            db.session.commit()
+            return {'message': 'Deleted'}
+        else:
+            return {'message': 'Diagnostico not found'}, 404
+
+    def put(self, id):
+        data = request.get_json()
+        diagnostico = DiagnosticoModel.query.filter_by(id_diagnostico=id).first()
+        if diagnostico:
+            diagnostico.edad = data['edad']
+            diagnostico.peso = data['peso']
+            diagnostico.altura = data['altura']
+            diagnostico.problemas_salud = data['problemas_salud']
+            diagnostico.objetivo = data['objetivo']
+            diagnostico.fk_id_persona = data['fk_id_persona']
+        else:
+            diagnostico = DiagnosticoModel(id_usuario=id, **data)
+
+        db.session.add(diagnostico)
+        db.session.commit()
+        return diagnostico.json()
+
+
 api.add_resource(PersonaView, '/personas')
 api.add_resource(SinglePersonaView, '/persona/<int:id>')
 api.add_resource(ModeloView, '/modelo')
 api.add_resource(UsuarioView, '/usuarios')
 api.add_resource(SingleUsuarioView, '/usuario/<int:id>')
+api.add_resource(DiagnosticoView, '/diagnosticos')
+api.add_resource(SingleDiagnosticoView, '/diagnostico/<int:id>')
 
 app.debug = True
 if __name__ == '__main__':

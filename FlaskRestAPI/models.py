@@ -41,3 +41,25 @@ class UsuarioModel(db.Model):
 
     def json(self):
         return {"id_usuario": self.id_usuario, "usuario": self.usuario, "contrasenia": self.contrasenia, "correo": self.correo, "rol": self.rol, "fk_id_persona": self.fk_id_persona}
+
+
+class DiagnosticoModel(db.Model):
+    __tablename__ = 'diagnostico'
+    id_diagnostico = db.Column(db.Integer, primary_key=True)
+    edad = db.Column(db.Integer())
+    peso = db.Column(db.Integer())
+    altura = db.Column(db.Integer())
+    problemas_salud = db.Column(db.String(100))
+    objetivo = db.Column(db.String(150))
+    fk_id_persona = db.Column(db.Integer())
+
+    def __init__(self, edad, peso, altura, problemas_salud, objetivo, fk_id_persona):
+        self.edad = edad
+        self.peso = peso
+        self.altura = altura
+        self.problemas_salud = problemas_salud
+        self.objetivo = objetivo
+        self.fk_id_persona = fk_id_persona
+
+    def json(self):
+        return {"id_diagnostico": self.id_diagnostico, "edad": self.edad, "peso": self.peso, "altura": self.altura, "problemas_salud": self.problemas_salud, "objetivo": self.objetivo, "fk_id_persona": self.fk_id_persona}
