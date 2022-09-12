@@ -11,7 +11,8 @@ class PersonaModel(db.Model):
     ci = db.Column(db.String(15))    
     celular = db.Column(db.Integer())
 
-    def __init__(self, nombres, paterno, materno, ci, celular):
+    def __init__(self, id_persona, nombres, paterno, materno, ci, celular):
+        self.id_persona = id_persona
         self.nombres = nombres
         self.paterno = paterno
         self.materno = materno
@@ -19,4 +20,4 @@ class PersonaModel(db.Model):
         self.celular = celular
 
     def json(self):
-        return {"nombres":self.nombres, "paterno":self.paterno, "materno":self.materno, "ci":self.ci, "celular":self.celular}
+        return {"id_persona":self.id_persona, "nombres":self.nombres, "paterno":self.paterno, "materno":self.materno, "ci":self.ci, "celular":self.celular}

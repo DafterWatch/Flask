@@ -38,7 +38,7 @@ class PersonaView(Resource):
     # )/
     def get(self):
         personas = PersonaModel.query.all()
-        return {'Persona':list(x.json() for x in personas)}
+        return {'Personas':list(x.json() for x in personas)}
     def post(self):
         data = request.get_json()
         new_persona = PersonaModel(data['nombres'],data['paterno'], data['materno'], data['ci'], data['celular'])
