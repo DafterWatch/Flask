@@ -2,7 +2,7 @@ from ast import parse
 from distutils import core
 from flask import Flask, request
 from flask_restful import Api, Resource, reqparse
-from models import PersonaModel, db
+from models import PersonaModel, UsuarioModel, db
 from flask import Flask
 from flask_cors import CORS
 from modelo import predecir
@@ -55,7 +55,6 @@ class PersonaView(Resource):
 
 class SinglePersonaView(Resource):
     def get(self, id):
-        print("ola2")
         persona = PersonaModel.query.filter_by(id_persona=id).first()
         if persona:
             return persona.json()
@@ -96,9 +95,59 @@ class ModeloView(Resource):
         return {"valor": str(prediccion[0])}, 201
 
 
+class UsuarioView(Resource):
+    def get(self):
+        usuarios = UsuarioModel.query.all()
+        return {'Usuarios': list(x.json() for x in usuarios)}
+
+    def post(self):
+        data = request.get_json()
+        new_usuario = UsuarioModel(
+            data['usuario'], data['contrasenia'], data['correo'], data['rol'], data['fk_id_persona'])
+        db.session.add(new_usuario)
+        db.session.commit()
+        db.session.flush()
+        return new_usuario.json(), 201
+
+
+class SingleUsuarioView(Resource):
+    def get(self, id):
+        usuario = UsuarioModel.query.filter_by(id_usuario=id).first()
+        if usuario:
+            return usuario.json()
+        return {'message': 'Usuario id_usuario not found'}, 404
+
+    def delete(self, id):
+        usuario = UsuarioModel.query.filter_by(id_usuario=id).first()
+        if usuario:
+            db.session.delete(usuario)
+            db.session.commit()
+            return {'message': 'Deleted'}
+        else:
+            return {'message': 'Usuario not found'}, 404
+
+    def put(self, id):
+        data = request.get_json()
+        usuario = UsuarioModel.query.filter_by(id_usuario=id).first()
+        if usuario:
+            usuario.usuario = data['usuario']
+            usuario.contrasenia = data['contrasenia']
+            usuario.correo = data['correo']
+            usuario.rol = data['rol']
+            usuario.fk_id_persona = data['fk_id_persona']
+        else:
+            usuario = UsuarioModel(id_usuario=id, **data)
+
+        db.session.add(usuario)
+        db.session.commit()
+        return usuario.json()
+
+
 api.add_resource(PersonaView, '/personas')
 api.add_resource(SinglePersonaView, '/persona/<int:id>')
 api.add_resource(ModeloView, '/modelo')
+api.add_resource(UsuarioView, '/usuarios')
+api.add_resource(SingleUsuarioView, '/usuario/<int:id>')
 
 app.debug = True
 if __name__ == '__main__':
