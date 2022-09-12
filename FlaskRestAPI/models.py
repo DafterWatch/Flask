@@ -2,19 +2,21 @@ from importlib.resources import Resource
 from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
-class ProductModel(db.Model):
-    __tablename__ = 'products'
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80))
-    description = db.Column(db.String(255))
-    price = db.Column(db.Integer())
-    brand = db.Column(db.String(80))
+class PersonaModel(db.Model):
+    __tablename__ = 'persona'
+    id_persona = db.Column(db.Integer, primary_key=True)
+    nombres = db.Column(db.String(100))
+    paterno = db.Column(db.String(50))
+    materno = db.Column(db.String(50))
+    ci = db.Column(db.String(15))    
+    celular = db.Column(db.Integer())
 
-    def __init__(self, name, description, price, brand):
-        self.name = name
-        self.description = description
-        self.price = price
-        self.brand = brand
+    def __init__(self, nombres, paterno, materno, ci, celular):
+        self.nombres = nombres
+        self.paterno = paterno
+        self.materno = materno
+        self.ci = ci
+        self.celular = celular
 
     def json(self):
-        return {"name":self.name, "description":self.description, "price":self.price, "brand":self.brand}
+        return {"nombres":self.nombres, "paterno":self.paterno, "materno":self.materno, "ci":self.ci, "celular":self.celular}
