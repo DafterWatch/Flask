@@ -191,6 +191,13 @@ class SingleDiagnosticoView(Resource):
         db.session.commit()
         return diagnostico.json()
 
+class LoginView(Resource):
+    def post(self):
+        data = request.get_json()
+        usuario = UsuarioModel.query.filter_by(usuario=data['usuario'], contrasenia=data['contrasenia']).first()
+        if usuario:
+            return usuario.json()
+        return {'message': 'Usuario id_usuario not found'}, 404
 
 api.add_resource(PersonaView, '/personas')
 api.add_resource(SinglePersonaView, '/persona/<int:id>')
@@ -199,6 +206,7 @@ api.add_resource(UsuarioView, '/usuarios')
 api.add_resource(SingleUsuarioView, '/usuario/<int:id>')
 api.add_resource(DiagnosticoView, '/diagnosticos')
 api.add_resource(SingleDiagnosticoView, '/diagnostico/<int:id>')
+api.add_resource(LoginView, '/login')
 
 app.debug = True
 if __name__ == '__main__':
