@@ -91,6 +91,7 @@ class ModeloView(Resource):
         data = request.get_json()
         datos = ([data['grasa'], data['altura'], data['peso'], data['experiencia'],
                   data['sexo'], data['endomorfo'], data['mesomorfo'], data['objetivo']])
+        #[6,180,77,8,1,0,0,0]]
         prediccion = predecir(datos)
         return {"valor": str(prediccion[0])}, 201
 
@@ -151,7 +152,7 @@ class DiagnosticoView(Resource):
     def post(self):
         data = request.get_json()
         new_diagnostico = DiagnosticoModel(
-            data['edad'], data['peso'], data['altura'], data['problemas_salud'], data['objetivo'], data['fk_id_persona'])
+            data['edad'], data['peso'], data['altura'], data['problemas_salud'], data['objetivo'], data['fk_id_persona'], data['grasa'], data['experiencia'], data['sexo'], data['tipocuerpo'])
         db.session.add(new_diagnostico)
         db.session.commit()
         db.session.flush()
@@ -160,7 +161,7 @@ class DiagnosticoView(Resource):
 
 class SingleDiagnosticoView(Resource):
     def get(self, id):
-        diagnostico = DiagnosticoModel.query.filter_by(id_diagnostico=id).first()
+        diagnostico = DiagnosticoModel.query.filter_by(fk_id_persona=id).first()
         if diagnostico:
             return diagnostico.json()
         return {'message': 'Diagnostico id_diagnostico not found'}, 404
