@@ -45,12 +45,19 @@ class PersonaView(Resource):
 
     def post(self):
         data = request.get_json()
-        new_persona = PersonaModel(
-            data['nombres'], data['paterno'], data['materno'], data['ci'], data['celular'])
-        db.session.add(new_persona)
-        db.session.commit()
-        db.session.flush()
-        return new_persona.json(), 201
+        print("CI")
+        print(data['ci'])
+        print("CI")
+        persona = PersonaModel.query.filter_by(ci=str(data['ci'])).first()
+        if persona:
+            return {'resultado':0}, 
+        else:            
+            new_persona = PersonaModel(
+                data['nombres'], data['paterno'], data['materno'], data['ci'], data['celular'])
+            db.session.add(new_persona)
+            db.session.commit()
+            db.session.flush()
+            return {'resultado':1, 'datos':new_persona.json()}, 201
 
 
 class SinglePersonaView(Resource):
@@ -91,7 +98,7 @@ class ModeloView(Resource):
         data = request.get_json()
         datos = ([data['grasa'], data['altura'], data['peso'], data['experiencia'],
                   data['sexo'], data['endomorfo'], data['mesomorfo'], data['objetivo']])
-        #[6,180,77,8,1,0,0,0]]
+        # [6,180,77,8,1,0,0,0]]
         prediccion = predecir(datos)
         return {"valor": str(prediccion[0])}, 201
 
@@ -161,13 +168,15 @@ class DiagnosticoView(Resource):
 
 class SingleDiagnosticoView(Resource):
     def get(self, id):
-        diagnostico = DiagnosticoModel.query.filter_by(fk_id_persona=id).first()
+        diagnostico = DiagnosticoModel.query.filter_by(
+            fk_id_persona=id).first()
         if diagnostico:
             return diagnostico.json()
         return {'message': 'Diagnostico id_diagnostico not found'}, 404
 
     def delete(self, id):
-        diagnostico = DiagnosticoModel.query.filter_by(id_diagnostico=id).first()
+        diagnostico = DiagnosticoModel.query.filter_by(
+            id_diagnostico=id).first()
         if diagnostico:
             db.session.delete(diagnostico)
             db.session.commit()
@@ -177,7 +186,8 @@ class SingleDiagnosticoView(Resource):
 
     def put(self, id):
         data = request.get_json()
-        diagnostico = DiagnosticoModel.query.filter_by(id_diagnostico=id).first()
+        diagnostico = DiagnosticoModel.query.filter_by(
+            id_diagnostico=id).first()
         if diagnostico:
             diagnostico.edad = data['edad']
             diagnostico.peso = data['peso']
@@ -192,13 +202,16 @@ class SingleDiagnosticoView(Resource):
         db.session.commit()
         return diagnostico.json()
 
+
 class LoginView(Resource):
     def post(self):
         data = request.get_json()
-        usuario = UsuarioModel.query.filter_by(usuario=data['usuario'], contrasenia=data['contrasenia']).first()
+        usuario = UsuarioModel.query.filter_by(
+            usuario=data['usuario'], contrasenia=data['contrasenia']).first()
         if usuario:
-            return {'resultado':1, 'datos':usuario.json()}
-        return {'resultado':0, 'datos':''}
+            return {'resultado': 1, 'datos': usuario.json()}
+        return {'resultado': 0, 'datos': ''}
+
 
 api.add_resource(PersonaView, '/personas')
 api.add_resource(SinglePersonaView, '/persona/<int:id>')
