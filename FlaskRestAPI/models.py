@@ -56,8 +56,9 @@ class DiagnosticoModel(db.Model):
     experiencia = db.Column(db.Integer())
     sexo = db.Column(db.Integer())
     tipocuerpo = db.Column(db.String(50))
+    rutina = db.Column(db.Integer())
 
-    def __init__(self, edad, peso, altura, problemas_salud, objetivo, fk_id_persona, grasa, experiencia, sexo, tipocuerpo):
+    def __init__(self, edad, peso, altura, problemas_salud, objetivo, fk_id_persona, grasa, experiencia, sexo, tipocuerpo, rutina):
         self.edad = edad
         self.peso = peso
         self.altura = altura
@@ -68,6 +69,7 @@ class DiagnosticoModel(db.Model):
         self.experiencia = experiencia
         self.sexo = sexo
         self.tipocuerpo = tipocuerpo
+        self.rutina = rutina
 
     def json(self):
-        return {"id_diagnostico": self.id_diagnostico, "edad": self.edad, "peso": self.peso, "altura": self.altura, "problemas_salud": self.problemas_salud, "objetivo": self.objetivo, "fk_id_persona": self.fk_id_persona, "grasa": self.grasa, "experiencia": self.experiencia, "sexo": self.sexo, "tipocuerpo": self.tipocuerpo}
+        return {"id_diagnostico": self.id_diagnostico, "edad": self.edad, "peso": self.peso, "altura": self.altura, "problemas_salud": self.problemas_salud, "objetivo": self.objetivo, "fk_id_persona": self.fk_id_persona, "grasa": self.grasa, "experiencia": self.experiencia, "sexo": self.sexo, "tipocuerpo": self.tipocuerpo, "rutina": self.rutina}

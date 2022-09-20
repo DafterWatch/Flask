@@ -152,7 +152,7 @@ class DiagnosticoView(Resource):
     def post(self):
         data = request.get_json()
         new_diagnostico = DiagnosticoModel(
-            data['edad'], data['peso'], data['altura'], data['problemas_salud'], data['objetivo'], data['fk_id_persona'], data['grasa'], data['experiencia'], data['sexo'], data['tipocuerpo'])
+            data['edad'], data['peso'], data['altura'], data['problemas_salud'], data['objetivo'], data['fk_id_persona'], data['grasa'], data['experiencia'], data['sexo'], data['tipocuerpo'], data['rutina'])
         db.session.add(new_diagnostico)
         db.session.commit()
         db.session.flush()
@@ -197,8 +197,8 @@ class LoginView(Resource):
         data = request.get_json()
         usuario = UsuarioModel.query.filter_by(usuario=data['usuario'], contrasenia=data['contrasenia']).first()
         if usuario:
-            return usuario.json()
-        return {'message': 'Usuario id_usuario not found'}, 404
+            return {'resultado':1, 'datos':usuario.json()}
+        return {'resultado':0, 'datos':''}
 
 api.add_resource(PersonaView, '/personas')
 api.add_resource(SinglePersonaView, '/persona/<int:id>')
