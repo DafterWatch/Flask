@@ -50,14 +50,14 @@ class PersonaView(Resource):
         print("CI")
         persona = PersonaModel.query.filter_by(ci=str(data['ci'])).first()
         if persona:
-            return {'resultado':0}, 
-        else:            
+            return {'resultado': 0},
+        else:
             new_persona = PersonaModel(
                 data['nombres'], data['paterno'], data['materno'], data['ci'], data['celular'])
             db.session.add(new_persona)
             db.session.commit()
             db.session.flush()
-            return {'resultado':1, 'datos':new_persona.json()}, 201
+            return {'resultado': 1, 'datos': new_persona.json()}, 201
 
 
 class SinglePersonaView(Resource):
@@ -120,7 +120,7 @@ class UsuarioView(Resource):
 
 class SingleUsuarioView(Resource):
     def get(self, id):
-        usuario = UsuarioModel.query.filter_by(id_usuario=id).first()
+        usuario = UsuarioModel.query.filter_by(fk_id_persona=id).first()
         if usuario:
             return usuario.json()
         return {'message': 'Usuario id_usuario not found'}, 404
