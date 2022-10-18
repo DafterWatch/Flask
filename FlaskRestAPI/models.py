@@ -73,3 +73,39 @@ class DiagnosticoModel(db.Model):
 
     def json(self):
         return {"id_diagnostico": self.id_diagnostico, "edad": self.edad, "peso": self.peso, "altura": self.altura, "problemas_salud": self.problemas_salud, "objetivo": self.objetivo, "fk_id_persona": self.fk_id_persona, "grasa": self.grasa, "experiencia": self.experiencia, "sexo": self.sexo, "tipocuerpo": self.tipocuerpo, "rutina": self.rutina}
+
+
+class PagoModel(db.Model):
+    __tablename__ = 'pagos'
+    id_pago = db.Column(db.Integer, primary_key=True)
+    fk_id_usuario = db.Column(db.Integer)
+    fk_id_servicio = db.Column(db.Integer)
+    monto_pagado = db.Column(db.Integer)
+    fecha = db.Column(db.DateTime(timezone=False))
+    fk_id_usuario_empleado = db.Column(db.Integer),
+    fecha_inicio_sus = db.Column(db.DateTime(timezone=False))
+    fecha_fin_sus = db.Column(db.DateTime(timezone=False))
+
+    def __init__(self, fk_id_usuario, fk_id_servicio, monto_pagado, fecha, fk_id_usuario_empleado, fecha_inicio_sus, fecha_fin_sus):
+        self.fk_id_usuario = fk_id_usuario
+        self.fk_id_servicio = fk_id_servicio
+        self.monto_pagado = monto_pagado
+        self.fecha = fecha
+        self.fk_id_usuario_empleado = fk_id_usuario_empleado
+        self.fecha_inicio_sus = fecha_inicio_sus
+        self.fecha_fin_sus = fecha_fin_sus
+
+    def json(self):
+        return {"fk_id_usuario": self.fk_id_usuario, "fk_id_servicio": self.fk_id_servicio, "monto_pagado": self.monto_pagado, "fecha": self.fecha, "fk_id_usuario_empleado": self.fk_id_usuario_empleado, "fecha_inicio_sus": self.fecha_inicio_sus, "fecha_fin_sus": self.fecha_fin_sus}
+
+class ServicioModel(db.Model):
+    __tablename__ = 'servicio'
+    id_servicio = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100))
+
+    def __init__(self, id_servicio, nombre):
+        self.id_servicio = id_servicio
+        self.nombre = nombre
+
+    def json(self):
+        return {"id_servicio": self.id_servicio, "nombre": self.nombre}

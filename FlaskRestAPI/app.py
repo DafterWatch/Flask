@@ -2,7 +2,8 @@ from ast import parse
 from distutils import core
 from flask import Flask, request
 from flask_restful import Api, Resource, reqparse
-from models import PersonaModel, UsuarioModel, DiagnosticoModel, db
+#from FlaskRestAPI.models import PagoModel
+from models import PersonaModel, UsuarioModel, DiagnosticoModel,PagoModel, db
 from flask import Flask
 from flask_cors import CORS
 from modelo import predecir
@@ -203,6 +204,56 @@ class SingleDiagnosticoView(Resource):
         return diagnostico.json()
 
 
+class PagoView(Resource):
+    def get(self):
+        pagos = PagoModel.query.all()
+        return {'Pagos': list(x.json() for x in pagos)}
+
+    def post(self):
+        data = request.get_json()
+        new_pago = PagoModel(
+            data['fk_id_usuario'], data['fk_id_servicio'], data['monto_pagado'], data['fecha'], data['fk_id_usuario_empleado'], data['fecha_inicio_sus'], data['fecha_fin_sus'])
+        db.session.add(new_pago)
+        db.session.commit()
+        db.session.flush()
+        return new_pago.json(), 201
+
+
+class SinglePagoView(Resource):
+    def get(self, id):
+        pago = PagoModel.query.filter_by(id_pago=id).first()
+        if pago:
+            return pago.json()
+        return {'message': 'Pago id_pago not found'}, 404
+
+    def delete(self, id):
+        pago = PagoModel.query.filter_by(id_pago=id).first()
+        if pago:
+            db.session.delete(pago)
+            db.session.commit()
+            return {'message': 'Deleted'}
+        else:
+            return {'message': 'Pago not found'}, 404
+
+    def put(self, id):
+        data = request.get_json()
+        pago = PagoModel.query.filter_by(id_pago=id).first()
+        if pago:
+            pago.fk_id_usuario = data['fk_id_usuario']
+            pago.fk_id_servicio = data['fk_id_servicio']
+            pago.monto_pagado = data['monto_pagado']
+            pago.fecha = data['fecha']
+            pago.fk_id_usuario_empleado = data['fk_id_usuario_empleado']
+            pago.fecha_inicio_sus = data['fecha_inicio_sus']
+            pago.fecha_fin_sus = data['fecha_fin_sus']
+        else:
+            pago = PagoModel(id_pago=id, **data)
+
+        db.session.add(pago)
+        db.session.commit()
+        return pago.json()
+
+
 class LoginView(Resource):
     def post(self):
         data = request.get_json()
@@ -220,6 +271,8 @@ api.add_resource(UsuarioView, '/usuarios')
 api.add_resource(SingleUsuarioView, '/usuario/<int:id>')
 api.add_resource(DiagnosticoView, '/diagnosticos')
 api.add_resource(SingleDiagnosticoView, '/diagnostico/<int:id>')
+api.add_resource(PagoView, '/pagos')
+api.add_resource(SinglePagoView, '/pago/<int:id>')
 api.add_resource(LoginView, '/login')
 
 app.debug = True
