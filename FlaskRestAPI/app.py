@@ -3,7 +3,7 @@ from distutils import core
 from flask import Flask, request
 from flask_restful import Api, Resource, reqparse
 #from FlaskRestAPI.models import PagoModel
-from models import PersonaModel, UsuarioModel, DiagnosticoModel,PagoModel, db
+from models import PersonaModel, UsuarioModel, DiagnosticoModel, PagoModel, ServicioModel, db
 from flask import Flask
 from flask_cors import CORS
 from modelo import predecir
@@ -254,6 +254,21 @@ class SinglePagoView(Resource):
         return pago.json()
 
 
+class ServicioView(Resource):
+    def get(self):
+        servicios = ServicioModel.query.all()
+        return {'Servicios': list(x.json() for x in servicios)}
+
+    def post(self):
+        data = request.get_json()
+        new_servicio = PagoModel(
+            data['id_servicio'], data['nombre'])
+        db.session.add(new_servicio)
+        db.session.commit()
+        db.session.flush()
+        return new_servicio.json(), 201
+
+
 class LoginView(Resource):
     def post(self):
         data = request.get_json()
@@ -273,6 +288,7 @@ api.add_resource(DiagnosticoView, '/diagnosticos')
 api.add_resource(SingleDiagnosticoView, '/diagnostico/<int:id>')
 api.add_resource(PagoView, '/pagos')
 api.add_resource(SinglePagoView, '/pago/<int:id>')
+api.add_resource(ServicioView, '/servicios')
 api.add_resource(LoginView, '/login')
 
 app.debug = True
