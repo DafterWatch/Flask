@@ -7,6 +7,8 @@ from models import PersonaModel, UsuarioModel, DiagnosticoModel, PagoModel, Serv
 from flask import Flask
 from flask_cors import CORS
 from modelo import predecir
+import json 
+from datetime import datetime
 
 app = Flask(__name__)
 CORS(app)
@@ -46,9 +48,6 @@ class PersonaView(Resource):
 
     def post(self):
         data = request.get_json()
-        print("CI")
-        print(data['ci'])
-        print("CI")
         persona = PersonaModel.query.filter_by(ci=str(data['ci'])).first()
         if persona:
             return {'resultado': 0},
@@ -159,8 +158,12 @@ class DiagnosticoView(Resource):
 
     def post(self):
         data = request.get_json()
+        print("data")
+        print(data)
+        print("data")
+        json_str = json.dumps({'edad': data['edad']}, default=str)
         new_diagnostico = DiagnosticoModel(
-            data['edad'], data['peso'], data['altura'], data['problemas_salud'], data['objetivo'], data['fk_id_persona'], data['grasa'], data['experiencia'], data['sexo'], data['tipocuerpo'], data['rutina'])
+            json_str, data['peso'], data['altura'], data['problemas_salud'], data['objetivo'], data['fk_id_persona'], data['grasa'], data['experiencia'], data['sexo'], data['tipocuerpo'], data['rutina'])
         db.session.add(new_diagnostico)
         db.session.commit()
         db.session.flush()
@@ -190,7 +193,8 @@ class SingleDiagnosticoView(Resource):
         diagnostico = DiagnosticoModel.query.filter_by(
             id_diagnostico=id).first()
         if diagnostico:
-            diagnostico.edad = data['edad']
+            json_str = json.dumps({'edad': data['edad']}, default=str)
+            diagnostico.edad = json_str
             diagnostico.peso = data['peso']
             diagnostico.altura = data['altura']
             diagnostico.problemas_salud = data['problemas_salud']
@@ -278,6 +282,20 @@ class LoginView(Resource):
             return {'resultado': 1, 'datos': usuario.json()}
         return {'resultado': 0, 'datos': ''}
 
+class ValidateAddView(Resource):
+    def post(self):
+        data = request.get_json()
+        persona = PersonaModel.query.filter_by(ci=str(data['ci'])).first()
+        if persona:
+            return {'resultado': 0},
+        else:
+            usuario = UsuarioModel.query.filter_by(correo=str(data['correo'])).first()
+            if usuario:
+                return {'resultado': 0}
+            else:
+                return {'resultado': 1}, 201
+
+
 
 api.add_resource(PersonaView, '/personas')
 api.add_resource(SinglePersonaView, '/persona/<int:id>')
@@ -290,6 +308,7 @@ api.add_resource(PagoView, '/pagos')
 api.add_resource(SinglePagoView, '/pago/<int:id>')
 api.add_resource(ServicioView, '/servicios')
 api.add_resource(LoginView, '/login')
+api.add_resource(ValidateAddView, '/validateAdd')
 
 app.debug = True
 if __name__ == '__main__':
