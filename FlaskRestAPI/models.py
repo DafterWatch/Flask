@@ -1,5 +1,6 @@
 from importlib.resources import Resource
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 db = SQLAlchemy()
 
 
@@ -46,7 +47,7 @@ class UsuarioModel(db.Model):
 class DiagnosticoModel(db.Model):
     __tablename__ = 'diagnostico'
     id_diagnostico = db.Column(db.Integer, primary_key=True)
-    edad = db.Column(db.Integer())
+    edad = db.Column(db.Date())
     peso = db.Column(db.Integer())
     altura = db.Column(db.Integer())
     problemas_salud = db.Column(db.String(100))
@@ -81,10 +82,10 @@ class PagoModel(db.Model):
     fk_id_usuario = db.Column(db.Integer)
     fk_id_servicio = db.Column(db.Integer)
     monto_pagado = db.Column(db.Integer)
-    fecha = db.Column(db.DateTime(timezone=False))
+    fecha = db.Column(db.String(150))
     fk_id_usuario_empleado = db.Column(db.Integer),
-    fecha_inicio_sus = db.Column(db.DateTime(timezone=False))
-    fecha_fin_sus = db.Column(db.DateTime(timezone=False))
+    fecha_inicio_sus = db.Column(db.String(150))
+    fecha_fin_sus = db.Column(db.String(150))
 
     def __init__(self, fk_id_usuario, fk_id_servicio, monto_pagado, fecha, fk_id_usuario_empleado, fecha_inicio_sus, fecha_fin_sus):
         self.fk_id_usuario = fk_id_usuario
@@ -96,7 +97,14 @@ class PagoModel(db.Model):
         self.fecha_fin_sus = fecha_fin_sus
 
     def json(self):
-        return {"fk_id_usuario": self.fk_id_usuario, "fk_id_servicio": self.fk_id_servicio, "monto_pagado": self.monto_pagado, "fecha": self.fecha, "fk_id_usuario_empleado": self.fk_id_usuario_empleado, "fecha_inicio_sus": self.fecha_inicio_sus, "fecha_fin_sus": self.fecha_fin_sus}
+        print("OBJETO")
+        fechaN = datetime.now(self.fecha)
+        fecha_inicio_susN = datetime.now(self.fecha_inicio_sus)
+        fecha_fin_susN = datetime.now(self.fecha_fin_sus)
+        print(self.fecha_inicio_sus)
+        print(self.fecha_fin_sus)
+        print("OBJETO")
+        return {"fk_id_usuario": self.fk_id_usuario, "fk_id_servicio": self.fk_id_servicio, "monto_pagado": self.monto_pagado, "fecha": fechaN.strftime('%m/%d/%Y'), "fk_id_usuario_empleado": self.fk_id_usuario_empleado, "fecha_inicio_sus": fecha_inicio_susN.strftime('%m/%d/%Y'), "fecha_fin_sus": fecha_fin_susN.strftime('%m/%d/%Y')}
 
 class ServicioModel(db.Model):
     __tablename__ = 'servicio'
