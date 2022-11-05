@@ -1,5 +1,6 @@
 from ast import parse
 from distutils import core
+from sqlite3 import Date
 from flask import Flask, request
 from flask_restful import Api, Resource, reqparse
 #from FlaskRestAPI.models import PagoModel
@@ -9,6 +10,7 @@ from flask_cors import CORS
 from modelo import predecir
 import json 
 from datetime import datetime
+from json import dumps
 
 app = Flask(__name__)
 CORS(app)
@@ -161,13 +163,13 @@ class DiagnosticoView(Resource):
         print("data")
         print(data)
         print("data")
-        json_str = json.dumps({'edad': data['edad']}, default=str)
-        new_diagnostico = DiagnosticoModel(
-            json_str, data['peso'], data['altura'], data['problemas_salud'], data['objetivo'], data['fk_id_persona'], data['grasa'], data['experiencia'], data['sexo'], data['tipocuerpo'], data['rutina'])
+        #json_str = json.dumps({'edad': data['edad']}, default=str)
+        new_diagnostico = DiagnosticoModel( 
+            data['edad'], data['peso'], data['altura'], data['problemas_salud'], data['objetivo'], data['fk_id_persona'], data['grasa'], data['experiencia'], data['sexo'], data['tipocuerpo'], data['rutina'])
         db.session.add(new_diagnostico)
         db.session.commit()
         db.session.flush()
-        return new_diagnostico.json(), 201
+        return "Se ha registrado un nuevo wea", 201
 
 
 class SingleDiagnosticoView(Resource):

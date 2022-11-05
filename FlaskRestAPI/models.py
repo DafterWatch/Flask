@@ -47,7 +47,7 @@ class UsuarioModel(db.Model):
 class DiagnosticoModel(db.Model):
     __tablename__ = 'diagnostico'
     id_diagnostico = db.Column(db.Integer, primary_key=True)
-    edad = db.Column(db.Date())
+    edad = db.Column(db.DateTime())
     peso = db.Column(db.Integer())
     altura = db.Column(db.Integer())
     problemas_salud = db.Column(db.String(100))
