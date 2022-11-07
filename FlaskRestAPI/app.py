@@ -163,7 +163,6 @@ class DiagnosticoView(Resource):
         print("data")
         print(data)
         print("data")
-        #json_str = json.dumps({'edad': data['edad']}, default=str)
         new_diagnostico = DiagnosticoModel( 
             data['edad'], data['peso'], data['altura'], data['problemas_salud'], data['objetivo'], data['fk_id_persona'], data['grasa'], data['experiencia'], data['sexo'], data['tipocuerpo'], data['rutina'])
         db.session.add(new_diagnostico)
@@ -177,6 +176,9 @@ class SingleDiagnosticoView(Resource):
         diagnostico = DiagnosticoModel.query.filter_by(
             fk_id_persona=id).first()
         if diagnostico:
+            print("diagnostico")
+            print(diagnostico.json())
+            print("diagnostico")
             return diagnostico.json()
         return {'message': 'Diagnostico id_diagnostico not found'}, 404
 
@@ -195,13 +197,16 @@ class SingleDiagnosticoView(Resource):
         diagnostico = DiagnosticoModel.query.filter_by(
             id_diagnostico=id).first()
         if diagnostico:
-            json_str = json.dumps({'edad': data['edad']}, default=str)
-            diagnostico.edad = json_str
+            diagnostico.edad = data['edad']
             diagnostico.peso = data['peso']
             diagnostico.altura = data['altura']
+            diagnostico.grasa = data['grasa']
+            diagnostico.experiencia = data['experiencia']
             diagnostico.problemas_salud = data['problemas_salud']
             diagnostico.objetivo = data['objetivo']
             diagnostico.fk_id_persona = data['fk_id_persona']
+            diagnostico.sexo = data['sexo']
+            diagnostico.tipocuerpo = data['tipocuerpo']
         else:
             diagnostico = DiagnosticoModel(id_usuario=id, **data)
 
