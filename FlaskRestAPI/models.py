@@ -82,10 +82,10 @@ class PagoModel(db.Model):
     fk_id_usuario = db.Column(db.Integer)
     fk_id_servicio = db.Column(db.Integer)
     monto_pagado = db.Column(db.Integer)
-    fecha = db.Column(db.String(150))
+    fecha = db.Column(db.String(100))
     fk_id_usuario_empleado = db.Column(db.Integer),
-    fecha_inicio_sus = db.Column(db.String(150))
-    fecha_fin_sus = db.Column(db.String(150))
+    fecha_inicio_sus = db.Column(db.String(100))
+    fecha_fin_sus = db.Column(db.String(100))
 
     def __init__(self, fk_id_usuario, fk_id_servicio, monto_pagado, fecha, fk_id_usuario_empleado, fecha_inicio_sus, fecha_fin_sus):
         self.fk_id_usuario = fk_id_usuario
@@ -97,14 +97,7 @@ class PagoModel(db.Model):
         self.fecha_fin_sus = fecha_fin_sus
 
     def json(self):
-        print("OBJETO")
-        fechaN = datetime.now(self.fecha)
-        fecha_inicio_susN = datetime.now(self.fecha_inicio_sus)
-        fecha_fin_susN = datetime.now(self.fecha_fin_sus)
-        print(self.fecha_inicio_sus)
-        print(self.fecha_fin_sus)
-        print("OBJETO")
-        return {"fk_id_usuario": self.fk_id_usuario, "fk_id_servicio": self.fk_id_servicio, "monto_pagado": self.monto_pagado, "fecha": fechaN.strftime('%m/%d/%Y'), "fk_id_usuario_empleado": self.fk_id_usuario_empleado, "fecha_inicio_sus": fecha_inicio_susN.strftime('%m/%d/%Y'), "fecha_fin_sus": fecha_fin_susN.strftime('%m/%d/%Y')}
+        return {"fk_id_usuario": self.fk_id_usuario, "fk_id_servicio": self.fk_id_servicio, "monto_pagado": self.monto_pagado, "fecha": self.fecha, "fk_id_usuario_empleado": self.fk_id_usuario_empleado, "fecha_inicio_sus": self.fecha_inicio_sus, "fecha_fin_sus": self.fecha_fin_sus}
 
 class ServicioModel(db.Model):
     __tablename__ = 'servicio'

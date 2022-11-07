@@ -168,7 +168,7 @@ class DiagnosticoView(Resource):
         db.session.add(new_diagnostico)
         db.session.commit()
         db.session.flush()
-        return "Se ha registrado un nuevo wea", 201
+        return new_diagnostico.json(), 201
 
 
 class SingleDiagnosticoView(Resource):
