@@ -126,3 +126,26 @@ class RutinaUsuarioModel(db.Model):
 
     def json(self):
         return {"id_rutina_usuario": self.id_rutina_usuario, "fk_id_persona": self.fk_id_persona, "fk_id_rutina": self.fk_id_rutina, "completa": self.completa}
+
+class RutinaModel(db.Model):
+    __tablename__ = 'rutinas'
+    id_rutina = db.Column(db.Integer, primary_key=True)
+    imagen = db.Column(db.String(1000))
+    titulo = db.Column(db.String(200))
+    repeticiones = db.Column(db.String(200))
+    descripcion = db.Column(db.String(500))
+    instrucciones = db.Column(db.String(500))
+    video = db.Column(db.String(1000))
+    id_rutina_grupo = db.Column(db.Integer)
+
+    def __init__(self, imagen, titulo, repeticiones, descripcion, instrucciones, video, id_rutina_grupo):
+        self.imagen = imagen
+        self.titulo = titulo
+        self.repeticiones = repeticiones
+        self.descripcion = descripcion
+        self.instrucciones = instrucciones
+        self.video = video
+        self.id_rutina_grupo = id_rutina_grupo
+
+    def json(self):
+        return {"id_rutina": self.id_rutina, "imagen": self.imagen, "titulo": self.titulo, "repeticiones": self.repeticiones, "descripcion": self.descripcion, "instrucciones": self.instrucciones, "video": self.video, "id_rutina_grupo": self.id_rutina_grupo}
