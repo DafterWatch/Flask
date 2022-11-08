@@ -97,7 +97,7 @@ class PagoModel(db.Model):
         self.fecha_fin_sus = fecha_fin_sus
 
     def json(self):
-        return {"fk_id_usuario": self.fk_id_usuario, "fk_id_servicio": self.fk_id_servicio, "monto_pagado": self.monto_pagado, "fecha": self.fecha, "fk_id_usuario_empleado": self.fk_id_usuario_empleado, "fecha_inicio_sus": self.fecha_inicio_sus, "fecha_fin_sus": self.fecha_fin_sus}
+        return {"id_pago":self.id_pago, "fk_id_usuario": self.fk_id_usuario, "fk_id_servicio": self.fk_id_servicio, "monto_pagado": self.monto_pagado, "fecha": self.fecha, "fecha_inicio_sus": self.fecha_inicio_sus, "fecha_fin_sus": self.fecha_fin_sus}
 
 class ServicioModel(db.Model):
     __tablename__ = 'servicio'
