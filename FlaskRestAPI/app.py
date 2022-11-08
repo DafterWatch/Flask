@@ -4,7 +4,7 @@ from sqlite3 import Date
 from flask import Flask, request
 from flask_restful import Api, Resource, reqparse
 #from FlaskRestAPI.models import PagoModel
-from models import PersonaModel, UsuarioModel, DiagnosticoModel, PagoModel, ServicioModel, db
+from models import PersonaModel, UsuarioModel, DiagnosticoModel, PagoModel, ServicioModel, RutinaUsuarioModel, db
 from flask import Flask
 from flask_cors import CORS
 from modelo import predecir
@@ -332,6 +332,50 @@ class ValidateAddView(Resource):
                 return {'resultado': 1}, 201
 
 
+class RutinaUsuarioView(Resource):
+    def get(self):
+        rutinausuario = RutinaUsuarioModel.query.all()
+        return {'RutinaUsuarios': list(x.json() for x in rutinausuario)}
+
+    def post(self):
+        data = request.get_json()
+        new_rutinausuario = RutinaUsuarioModel(
+            data['fk_id_persona'], data['fk_id_rutina'], data['completa'])
+        db.session.add(new_rutinausuario)
+        db.session.commit()
+        db.session.flush()
+        return new_rutinausuario.json(), 201
+
+class SingleRutinaUsuarioView(Resource):
+    def get(self, id):
+        rutinausuario = RutinaUsuarioModel.query.filter_by(id_rutina_usuario=id).first()
+        if rutinausuario:
+            return rutinausuario.json()
+        return {'message': 'rutinausuario id_rutina_usuario not found'}, 404
+
+    def delete(self, id):
+        rutinausuario = RutinaUsuarioModel.query.filter_by(id_rutina_usuario=id).first()
+        if rutinausuario:
+            db.session.delete(rutinausuario)
+            db.session.commit()
+            return {'message': 'Deleted'}
+        else:
+            return {'message': 'rutinausuario not found'}, 404
+
+    def put(self, id):
+        data = request.get_json()
+        rutinaservicio = RutinaUsuarioModel.query.filter_by(id_rutina_usuario=id).first()
+        if rutinaservicio:
+            rutinaservicio.fk_id_persona = data['fk_id_persona']
+            rutinaservicio.fk_id_rutina = data['fk_id_rutina']
+            rutinaservicio.completa = data['completa']
+        else:
+            rutinaservicio = RutinaUsuarioModel(id_rutina_usuario=id, **data)
+
+        db.session.add(rutinaservicio)
+        db.session.commit()
+        return rutinaservicio.json()
+
 
 api.add_resource(PersonaView, '/personas')
 api.add_resource(SinglePersonaView, '/persona/<int:id>')
@@ -344,6 +388,8 @@ api.add_resource(PagoView, '/pagos')
 api.add_resource(SinglePagoView, '/pago/<int:id>')
 api.add_resource(ServicioView, '/servicios')
 api.add_resource(SingleServicioView, '/servicio/<int:id>')
+api.add_resource(RutinaUsuarioView, '/rutinausuarios')
+api.add_resource(SingleRutinaUsuarioView, '/rutinausuario/<int:id>')
 api.add_resource(LoginView, '/login')
 api.add_resource(ValidateAddView, '/validateAdd')
 

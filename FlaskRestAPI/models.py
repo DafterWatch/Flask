@@ -111,3 +111,18 @@ class ServicioModel(db.Model):
 
     def json(self):
         return {"id_servicio": self.id_servicio, "nombre": self.nombre, "precio": self.precio}
+
+class RutinaUsuarioModel(db.Model):
+    __tablename__ = 'rutinasusuarios'
+    id_rutina_usuario = db.Column(db.Integer, primary_key=True)
+    fk_id_persona = db.Column(db.String(100))
+    fk_id_rutina = db.Column(db.Integer)
+    completa = db.Column(db.Boolean)
+
+    def __init__(self, fk_id_persona, fk_id_rutina, completa):
+        self.fk_id_persona = fk_id_persona
+        self.fk_id_rutina = fk_id_rutina
+        self.completa = completa
+
+    def json(self):
+        return {"id_rutina_usuario": self.id_rutina_usuario, "fk_id_persona": self.fk_id_persona, "fk_id_rutina": self.fk_id_rutina, "completa": self.completa}
