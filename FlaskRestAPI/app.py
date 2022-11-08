@@ -272,12 +272,41 @@ class ServicioView(Resource):
 
     def post(self):
         data = request.get_json()
-        new_servicio = PagoModel(
-            data['id_servicio'], data['nombre'])
+        new_servicio = ServicioModel(
+            data['nombre'], data['precio'])
         db.session.add(new_servicio)
         db.session.commit()
         db.session.flush()
         return new_servicio.json(), 201
+
+class SingleServicioView(Resource):
+    def get(self, id):
+        servicio = ServicioModel.query.filter_by(id_servicio=id).first()
+        if servicio:
+            return servicio.json()
+        return {'message': 'Servicio id_servicio not found'}, 404
+
+    def delete(self, id):
+        servicio = ServicioModel.query.filter_by(id_servicio=id).first()
+        if servicio:
+            db.session.delete(servicio)
+            db.session.commit()
+            return {'message': 'Deleted'}
+        else:
+            return {'message': 'Servicio not found'}, 404
+
+    def put(self, id):
+        data = request.get_json()
+        servicio = ServicioModel.query.filter_by(id_servicio=id).first()
+        if servicio:
+            servicio.nombre = data['nombre']
+            servicio.precio = data['precio']
+        else:
+            servicio = ServicioModel(id_servicio=id, **data)
+
+        db.session.add(servicio)
+        db.session.commit()
+        return servicio.json()
 
 
 class LoginView(Resource):
@@ -314,6 +343,7 @@ api.add_resource(SingleDiagnosticoView, '/diagnostico/<int:id>')
 api.add_resource(PagoView, '/pagos')
 api.add_resource(SinglePagoView, '/pago/<int:id>')
 api.add_resource(ServicioView, '/servicios')
+api.add_resource(SingleServicioView, '/servicio/<int:id>')
 api.add_resource(LoginView, '/login')
 api.add_resource(ValidateAddView, '/validateAdd')
 

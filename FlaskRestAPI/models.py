@@ -103,10 +103,11 @@ class ServicioModel(db.Model):
     __tablename__ = 'servicio'
     id_servicio = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100))
+    precio = db.Column(db.Integer)
 
-    def __init__(self, id_servicio, nombre):
-        self.id_servicio = id_servicio
+    def __init__(self, nombre, precio):
         self.nombre = nombre
+        self.precio = precio
 
     def json(self):
-        return {"id_servicio": self.id_servicio, "nombre": self.nombre}
+        return {"id_servicio": self.id_servicio, "nombre": self.nombre, "precio": self.precio}
