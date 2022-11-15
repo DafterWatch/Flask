@@ -232,7 +232,7 @@ class PagoView(Resource):
 
 class SinglePagoView(Resource):
     def get(self, id):
-        pago = PagoModel.query.filter_by(id_pago=id).first()
+        pago = PagoModel.query.filter_by(fk_id_usuario=id).first()
         if pago:
             return pago.json()
         return {'message': 'Pago id_pago not found'}, 404
