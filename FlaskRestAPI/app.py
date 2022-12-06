@@ -348,9 +348,9 @@ class RutinaUsuarioView(Resource):
 
 class SingleRutinaUsuarioView(Resource):
     def get(self, id):
-        rutinausuario = RutinaUsuarioModel.query.filter_by(id_rutina_usuario=id).first()
+        rutinausuario = RutinaUsuarioModel.query.filter_by(fk_id_persona=id)
         if rutinausuario:
-            return rutinausuario.json()
+            return {'RutinaUsuarios': list(x.json() for x in rutinausuario)}
         return {'message': 'rutinausuario id_rutina_usuario not found'}, 404
 
     def delete(self, id):
