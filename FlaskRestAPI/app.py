@@ -4,7 +4,7 @@ from sqlite3 import Date
 from flask import Flask, request
 from flask_restful import Api, Resource, reqparse
 #from FlaskRestAPI.models import PagoModel
-from models import PersonaModel, UsuarioModel, DiagnosticoModel, PagoModel, ServicioModel, RutinaUsuarioModel, RutinaModel, db
+from models import PersonaModel, UsuarioModel, DiagnosticoModel, PagoModel, ServicioModel, RutinaUsuarioModel, RutinaModel, NoticiasModel, db
 from flask import Flask
 from flask_cors import CORS
 from modelo import predecir
@@ -424,6 +424,51 @@ class SingleRutinaView(Resource):
         db.session.commit()
         return rutina.json()
 
+class NoticiaView(Resource):
+    def get(self):
+        noticias = NoticiasModel.query.all()
+        return {'Noticias': list(x.json() for x in noticias)}
+
+    def post(self):
+        data = request.get_json()
+        new_noticia = NoticiasModel(
+            data['titulo'], data['descripcion'], data['imagen'], data['fecha'])
+        db.session.add(new_noticia)
+        db.session.commit()
+        db.session.flush()
+        return new_noticia.json(), 201
+
+class SingleNoticiaView(Resource):
+    def get(self, id):
+        noticia = NoticiasModel.query.filter_by(id_noticia=id).first()
+        if noticia:
+            return noticia.json()
+        return {'message': 'noticia id_noticia not found'}, 404
+
+    def delete(self, id):
+        noticia = NoticiasModel.query.filter_by(id_noticia=id).first()
+        if noticia:
+            db.session.delete(noticia)
+            db.session.commit()
+            return {'message': 'Deleted'}
+        else:
+            return {'message': 'noticia not found'}, 404
+
+    def put(self, id):
+        data = request.get_json()
+        noticia = NoticiasModel.query.filter_by(id_noticia=id).first()
+        if noticia:
+            noticia.titulo = data['titulo']
+            noticia.descripcion = data['descripcion']
+            noticia.imagen = data['imagen']
+            noticia.fecha = data['fecha']
+        else:
+            noticia = NoticiasModel(id_noticia=id, **data)
+
+        db.session.add(noticia)
+        db.session.commit()
+        return noticia.json()
+
 
 api.add_resource(PersonaView, '/personas')
 api.add_resource(SinglePersonaView, '/persona/<int:id>')
@@ -442,6 +487,8 @@ api.add_resource(RutinaView, '/rutinas')
 api.add_resource(SingleRutinaView, '/rutina/<int:id>')
 api.add_resource(LoginView, '/login')
 api.add_resource(ValidateAddView, '/validateAdd')
+api.add_resource(NoticiaView, '/noticias')
+api.add_resource(SingleNoticiaView, '/noticia/<int:id>')
 
 app.debug = True
 if __name__ == '__main__':

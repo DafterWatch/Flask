@@ -149,3 +149,20 @@ class RutinaModel(db.Model):
 
     def json(self):
         return {"id_rutina": self.id_rutina, "imagen": self.imagen, "titulo": self.titulo, "repeticiones": self.repeticiones, "descripcion": self.descripcion, "instrucciones": self.instrucciones, "video": self.video, "id_rutina_grupo": self.id_rutina_grupo}
+
+class NoticiasModel(db.Model):
+    __tablename__ = 'noticias'
+    id_noticia = db.Column(db.Integer, primary_key=True)
+    titulo = db.Column(db.String(200))
+    descripcion = db.Column(db.String(1000))
+    imagen = db.Column(db.String(1000))
+    fecha = db.Column(db.String(20))
+
+    def __init__(self, titulo, descripcion, imagen, fecha):
+        self.titulo = titulo
+        self.descripcion = descripcion
+        self.imagen = imagen
+        self.fecha = fecha
+
+    def json(self):
+        return {"id_noticia": self.id_noticia, "titulo": self.titulo, "descripcion": self.descripcion, "imagen": self.imagen, "fecha": self.fecha}
