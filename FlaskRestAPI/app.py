@@ -55,7 +55,7 @@ class PersonaView(Resource):
             return {'resultado': 0},
         else:
             new_persona = PersonaModel(
-                data['nombres'], data['paterno'], data['materno'], data['ci'], data['celular'])
+                data['primernombre'], data['segundonombre'],data['paterno'], data['materno'], data['ci'], data['celular'])
             db.session.add(new_persona)
             db.session.commit()
             db.session.flush()
@@ -82,7 +82,8 @@ class SinglePersonaView(Resource):
         data = request.get_json()
         persona = PersonaModel.query.filter_by(id_persona=id).first()
         if persona:
-            persona.nombres = data['nombres']
+            persona.primernombre = data['primernombre']
+            persona.segundonombre = data['segundonombre']
             persona.paterno = data['paterno']
             persona.materno = data['materno']
             persona.ci = data['ci']
@@ -98,6 +99,8 @@ class SinglePersonaView(Resource):
 class ModeloView(Resource):
     def post(self):
         data = request.get_json()
+        print('data modelo')
+        print(data)
         datos = ([data['grasa'], data['altura'], data['peso'], data['experiencia'],
                   data['sexo'], data['endomorfo'], data['mesomorfo'], data['objetivo']])
         # [6,180,77,8,1,0,0,0]]
@@ -175,12 +178,14 @@ class SingleDiagnosticoView(Resource):
     def get(self, id):
         diagnostico = DiagnosticoModel.query.filter_by(
             fk_id_persona=id).first()
+        print('diagnostico')
+        print(diagnostico)
         if diagnostico:
             print("diagnostico")
             print(diagnostico.json())
             print("diagnostico")
             return diagnostico.json()
-        return {'message': 'Diagnostico id_diagnostico not found'}, 404
+        return {'message': 'Diagnostico id_diagnostico not founded'}, 404
 
     def delete(self, id):
         diagnostico = DiagnosticoModel.query.filter_by(
@@ -214,11 +219,56 @@ class SingleDiagnosticoView(Resource):
         db.session.commit()
         return diagnostico.json()
 
-
+class SinglePagoSpecialView(Resource):
+    def get(self, id):
+        pago = PagoModel.query.filter_by(fk_id_usuario=id).first()
+        if pago:
+            return pago.json()
+        return {'message': 'Pago id_pago not found'}, 404
+    
 class PagoView(Resource):
+    # def get(self):
+    #     pagos = PagoModel.query.all()
+    #     return {'Pagos': list(x.json() for x in pagos)}
     def get(self):
-        pagos = PagoModel.query.all()
-        return {'Pagos': list(x.json() for x in pagos)}
+        # Realizar un JOIN entre las tablas pagos, usuario y servicio
+        resultados = db.session.query(
+            PagoModel.id_pago,
+            PagoModel.fk_id_usuario,
+            PagoModel.fk_id_servicio,
+            PagoModel.monto_pagado,
+            PagoModel.fecha,
+            PagoModel.fk_id_usuario_empleado,
+            PagoModel.fecha_inicio_sus,
+            PagoModel.fecha_fin_sus,
+            UsuarioModel.correo,
+            ServicioModel.nombre
+        ).join(
+            UsuarioModel, PagoModel.fk_id_usuario == UsuarioModel.id_usuario
+        ).join(
+            ServicioModel, PagoModel.fk_id_servicio == ServicioModel.id_servicio
+        ).all()
+
+        if resultados:
+            # Crear una lista de diccionarios con los resultados
+            resultados_list = []
+            for resultado in resultados:
+                resultado_dict = {
+                    'id_pago': resultado[0],
+                    'fk_id_usuario': resultado[1],
+                    'fk_id_servicio': resultado[2],
+                    'monto_pagado': resultado[3],
+                    'fecha': resultado[4],
+                    'fk_id_usuario_empleado': resultado[5],
+                    'fecha_inicio_sus': resultado[6],
+                    'fecha_fin_sus': resultado[7],
+                    'correo_usuario': resultado[8],
+                    'nombre_servicio': resultado[9],
+                }
+                resultados_list.append(resultado_dict)
+            
+            return resultados_list
+        return {'message': 'No se encontraron pagos'}, 404
 
     def post(self):
         data = request.get_json()
@@ -231,10 +281,47 @@ class PagoView(Resource):
 
 
 class SinglePagoView(Resource):
+    # def get(self, id):
+    #     pago = PagoModel.query.filter_by(fk_id_usuario=id).first()
+    #     if pago:
+    #         return pago.json()
+    #     return {'message': 'Pago id_pago not found'}, 404
     def get(self, id):
-        pago = PagoModel.query.filter_by(fk_id_usuario=id).first()
-        if pago:
-            return pago.json()
+        # Realizar un JOIN entre las tablas pagos, usuario y servicio
+        resultado = db.session.query(
+            PagoModel.id_pago,
+            PagoModel.fk_id_usuario,
+            PagoModel.fk_id_servicio,
+            PagoModel.monto_pagado,
+            PagoModel.fecha,
+            PagoModel.fk_id_usuario_empleado,
+            PagoModel.fecha_inicio_sus,
+            PagoModel.fecha_fin_sus,
+            UsuarioModel.correo,
+            ServicioModel.nombre
+        ).join(
+            UsuarioModel, PagoModel.fk_id_usuario == UsuarioModel.id_usuario
+        ).join(
+            ServicioModel, PagoModel.fk_id_servicio == ServicioModel.id_servicio
+        ).filter(
+            PagoModel.id_pago == id
+        ).first()
+
+        if resultado:
+            # Crear un diccionario con los resultados
+            resultado_dict = {
+                'id_pago': resultado[0],
+                'fk_id_usuario': resultado[1],
+                'fk_id_servicio': resultado[2],
+                'monto_pagado': resultado[3],
+                'fecha': resultado[4],
+                'fk_id_usuario_empleado': resultado[5],
+                'fecha_inicio_sus': resultado[6],
+                'fecha_fin_sus': resultado[7],
+                'correo_usuario': resultado[8],
+                'nombre_servicio': resultado[9],
+            }
+            return resultado_dict
         return {'message': 'Pago id_pago not found'}, 404
 
     def delete(self, id):
@@ -321,16 +408,21 @@ class LoginView(Resource):
 class ValidateAddView(Resource):
     def post(self):
         data = request.get_json()
+        print('data')
+        print(data)
         persona = PersonaModel.query.filter_by(ci=str(data['ci'])).first()
         if persona:
-            return {'resultado': 0},
+            print('persona')
+            print(persona.json())
+            return {'resultado': 0, 'mensaje':'Usuario o correo ya registrado'}
         else:
             usuario = UsuarioModel.query.filter_by(correo=str(data['correo'])).first()
             if usuario:
-                return {'resultado': 0}
+                print('usuario')
+                print(usuario.json())
+                return {'resultado': 0, 'mensaje':'Usuario o correo ya registrado'}
             else:
                 return {'resultado': 1}, 201
-
 
 class RutinaUsuarioView(Resource):
     def get(self):
@@ -429,8 +521,10 @@ class NoticiaView(Resource):
         noticias = NoticiasModel.query.all()
         return {'Noticias': list(x.json() for x in noticias)}
 
-    def post(self):
+    def post(self):        
         data = request.get_json()
+        print('data')
+        print(data)
         new_noticia = NoticiasModel(
             data['titulo'], data['descripcion'], data['imagen'], data['fecha'])
         db.session.add(new_noticia)
@@ -469,7 +563,6 @@ class SingleNoticiaView(Resource):
         db.session.commit()
         return noticia.json()
 
-
 api.add_resource(PersonaView, '/personas')
 api.add_resource(SinglePersonaView, '/persona/<int:id>')
 api.add_resource(ModeloView, '/modelo')
@@ -489,6 +582,7 @@ api.add_resource(LoginView, '/login')
 api.add_resource(ValidateAddView, '/validateAdd')
 api.add_resource(NoticiaView, '/noticias')
 api.add_resource(SingleNoticiaView, '/noticia/<int:id>')
+api.add_resource(SinglePagoSpecialView, '/pagospecial/<int:id>')
 
 app.debug = True
 if __name__ == '__main__':

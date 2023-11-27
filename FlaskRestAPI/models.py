@@ -7,21 +7,23 @@ db = SQLAlchemy()
 class PersonaModel(db.Model):
     __tablename__ = 'persona'
     id_persona = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nombres = db.Column(db.String(100))
+    primernombre = db.Column(db.String(100))
+    segundonombre = db.Column(db.String(100))
     paterno = db.Column(db.String(50))
     materno = db.Column(db.String(50))
     ci = db.Column(db.String(15))
     celular = db.Column(db.Integer())
 
-    def __init__(self, nombres, paterno, materno, ci, celular):
-        self.nombres = nombres
+    def __init__(self, primernombre,segundonombre, paterno, materno, ci, celular):
+        self.primernombre = primernombre
+        self.segundonombre = segundonombre
         self.paterno = paterno
         self.materno = materno
         self.ci = ci
         self.celular = celular
 
     def json(self):
-        return {"id_persona": self.id_persona, "nombres": self.nombres, "paterno": self.paterno, "materno": self.materno, "ci": self.ci, "celular": self.celular}
+        return {"id_persona": self.id_persona, "primernombre": self.primernombre, "segundonombre": self.segundonombre,"paterno": self.paterno, "materno": self.materno, "ci": self.ci, "celular": self.celular}
 
 
 class UsuarioModel(db.Model):
@@ -83,7 +85,7 @@ class PagoModel(db.Model):
     fk_id_servicio = db.Column(db.Integer)
     monto_pagado = db.Column(db.Integer)
     fecha = db.Column(db.String(100))
-    fk_id_usuario_empleado = db.Column(db.Integer),
+    fk_id_usuario_empleado = db.Column(db.Integer)
     fecha_inicio_sus = db.Column(db.String(100))
     fecha_fin_sus = db.Column(db.String(100))
 
