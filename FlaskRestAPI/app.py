@@ -562,6 +562,47 @@ class SingleNoticiaView(Resource):
         db.session.add(noticia)
         db.session.commit()
         return noticia.json()
+class PersonaUsuarioView(Resource):
+    def get(self, id):
+        # Realizar un INNER JOIN entre las tablas persona y usuario
+        resultado = db.session.query(
+            PersonaModel.id_persona,
+            PersonaModel.primernombre,
+            PersonaModel.segundonombre,
+            PersonaModel.paterno,
+            PersonaModel.materno,
+            PersonaModel.ci,
+            PersonaModel.celular,
+            UsuarioModel.id_usuario,
+            UsuarioModel.usuario,
+            UsuarioModel.contrasenia,
+            UsuarioModel.correo,
+            UsuarioModel.rol,
+            UsuarioModel.fk_id_persona
+        ).join(
+            UsuarioModel, PersonaModel.id_persona == UsuarioModel.fk_id_persona
+        ).filter(
+            PersonaModel.id_persona == id
+        ).first()
+
+        if resultado:
+            resultado_dict = {
+                'id_persona': resultado[0],
+                'primernombre': resultado[1],
+                'segundonombre': resultado[2],
+                'paterno': resultado[3],
+                'materno': resultado[4],
+                'ci': resultado[5],
+                'celular': resultado[6],
+                'id_usuario': resultado[7],
+                'usuario': resultado[8],
+                'contrasenia': resultado[9],
+                'correo': resultado[10],
+                'rol': resultado[11],
+                'fk_id_persona': resultado[12],
+            }
+            return resultado_dict
+        return {'message': f'No se encontró la persona con id {id}'}, 404
 
 api.add_resource(PersonaView, '/personas')
 api.add_resource(SinglePersonaView, '/persona/<int:id>')
@@ -583,6 +624,7 @@ api.add_resource(ValidateAddView, '/validateAdd')
 api.add_resource(NoticiaView, '/noticias')
 api.add_resource(SingleNoticiaView, '/noticia/<int:id>')
 api.add_resource(SinglePagoSpecialView, '/pagospecial/<int:id>')
+api.add_resource(PersonaUsuarioView, '/perfil/<int:id>')
 
 app.debug = True
 if __name__ == '__main__':
