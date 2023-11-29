@@ -446,13 +446,13 @@ class SingleRutinaUsuarioView(Resource):
         return {'message': 'rutinausuario id_rutina_usuario not found'}, 404
 
     def delete(self, id):
-        rutinausuario = RutinaUsuarioModel.query.filter_by(id_rutina_usuario=id).first()
-        if rutinausuario:
-            db.session.delete(rutinausuario)
+        deleted_rows = RutinaUsuarioModel.query.filter_by(fk_id_persona=id).delete()
+
+        if deleted_rows > 0:
             db.session.commit()
-            return {'message': 'Deleted'}
+            return {'message': f'Deleted {deleted_rows} rows where fk_id_persona is {id}'}, 200
         else:
-            return {'message': 'rutinausuario not found'}, 404
+            return {'message': f'No rows found with fk_id_persona {id}'}, 404
 
     def put(self, id):
         data = request.get_json()
